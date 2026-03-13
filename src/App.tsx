@@ -130,7 +130,7 @@ const Button = ({
 
 // --- Main App ---
 
-function App() {
+export default function App() {
   const [data, setData] = useState<AppData>(() => {
     const saved = localStorage.getItem("math_game_data");
     return saved ? JSON.parse(saved) : DEFAULT_DATA;
@@ -1046,5 +1046,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
