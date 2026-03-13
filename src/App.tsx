@@ -738,7 +738,18 @@ const SettingsView = ({
     
     <Card className="space-y-10">
       <div className="space-y-4">
-        <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Gemini API Key</label>
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-black text-slate-400 uppercase tracking-widest">Gemini API Key</label>
+          <a 
+            href="https://aistudio.google.com/app/apikey" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-xs font-bold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100"
+          >
+            <Plus size={14} />
+            Lấy API Key miễn phí
+          </a>
+        </div>
         <div className="relative">
           <input 
             type={showApiKey ? "text" : "password"}
