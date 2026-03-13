@@ -68,6 +68,19 @@ ChartJS.register(
 const cn = (...inputs: ClassValue[]) => twMerge(clsx(inputs));
 const marked = new Marked();
 
+declare global {
+  interface Window {
+    MathJax: any;
+  }
+}
+
+// Helper to trigger MathJax
+const triggerMathJax = () => {
+  if (window.MathJax && window.MathJax.typesetPromise) {
+    window.MathJax.typesetPromise().catch((err: any) => console.error('MathJax typeset failed:', err));
+  }
+};
+
 // --- Components ---
 
 interface CardProps {
@@ -148,6 +161,10 @@ export default function App() {
   const [isAnswering, setIsAnswering] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [starUsed, setStarUsed] = useState(false);
+
+  useEffect(() => {
+    triggerMathJax();
+  }, [view, isGameActive]);
   const [gameStartTime, setGameStartTime] = useState(0);
 
   // Persistence
@@ -473,6 +490,10 @@ const GameView = ({
   setIsGameActive: (val: boolean) => void;
   setStarUsed: (val: boolean) => void;
 }) => {
+  useEffect(() => {
+    triggerMathJax();
+  }, [currentQuestionIndex, isAnswering, gameQuestions]);
+
   if (!gameQuestions.length) return null;
   const q = gameQuestions[currentQuestionIndex];
 
@@ -670,6 +691,10 @@ const TutorView = ({ apiKey }: { apiKey: string }) => {
   const [query, setQuery] = useState("");
   const [chat, setChat] = useState<{ role: "user" | "ai"; text: string }[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    triggerMathJax();
+  }, [chat]);
 
   const handleAsk = async () => {
     if (!query.trim() || !apiKey) return;
