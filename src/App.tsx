@@ -218,6 +218,7 @@ export default function App() {
 
     // Generate mock questions for demo if none exist
     const mockQuestions: Question[] = [
+      // Khởi động (2 câu)
       {
         id: "q1",
         content: "Cho hàm số $y = x^3 - 3x + 2$. Tìm số điểm cực trị của hàm số.",
@@ -229,21 +230,88 @@ export default function App() {
       },
       {
         id: "q2",
+        content: "Giá trị của $\\log_2 8$ là:",
+        options: ["A. 2", "B. 3", "C. 4", "D. 8"],
+        correctAnswer: 1,
+        explanation: "$\\log_2 8 = \\log_2 2^3 = 3$.",
+        difficulty: "Dễ",
+        topic: "Mũ & Logarit"
+      },
+      // Tăng tốc (2 câu)
+      {
+        id: "q3",
         content: "Tính đạo hàm của hàm số $y = \\ln(x^2 + 1)$.",
         options: ["A. $\\frac{1}{x^2+1}$", "B. $\\frac{2x}{x^2+1}$", "C. $\\frac{x}{x^2+1}$", "D. $2x(x^2+1)$"],
         correctAnswer: 1,
         explanation: "$y' = \\frac{(x^2+1)'}{x^2+1} = \\frac{2x}{x^2+1}$.",
         difficulty: "Trung bình",
-        topic: "Mũ & Logarit"
+        topic: "Đạo hàm"
       },
       {
-        id: "q3",
-        content: "Trong không gian Oxyz, cho mặt phẳng $(P): 2x - y + 2z - 3 = 0$. Khoảng cách từ điểm $M(1, 2, -1)$ đến mặt phẳng $(P)$ là:",
-        options: ["A. 1", "B. 5/3", "C. 2", "D. 3"],
+        id: "q4",
+        content: "Tập nghiệm của bất phương trình $2^x > 8$ là:",
+        options: ["A. $(3; +\\infty)$", "B. $(-\\infty; 3)$", "C. $(8; +\\infty)$", "D. $(-\\infty; 8)$"],
+        correctAnswer: 0,
+        explanation: "$2^x > 8 = 2^3 \\Leftrightarrow x > 3$. Tập nghiệm: $(3; +\\infty)$.",
+        difficulty: "Trung bình",
+        topic: "Mũ & Logarit"
+      },
+      // Đồng đội (2 câu)
+      {
+        id: "q5",
+        content: "Tính $\\int_0^1 x^2 dx$.",
+        options: ["A. $\\frac{1}{2}$", "B. $\\frac{1}{3}$", "C. $1$", "D. $\\frac{2}{3}$"],
         correctAnswer: 1,
-        explanation: "$d(M, P) = \\frac{|2(1) - (2) + 2(-1) - 3|}{\\sqrt{2^2 + (-1)^2 + 2^2}} = \\frac{|-5|}{3} = 5/3$.",
+        explanation: "$\\int_0^1 x^2 dx = \\frac{x^3}{3} \\Big|_0^1 = \\frac{1}{3}$.",
+        difficulty: "Trung bình",
+        topic: "Tích phân"
+      },
+      {
+        id: "q6",
+        content: "Cho cấp số cộng $(u_n)$ với $u_1 = 3$, $d = 2$. Tìm $u_{10}$.",
+        options: ["A. 19", "B. 21", "C. 23", "D. 25"],
+        correctAnswer: 1,
+        explanation: "$u_{10} = u_1 + 9d = 3 + 9 \\cdot 2 = 21$.",
+        difficulty: "Dễ",
+        topic: "Dãy số"
+      },
+      // Vượt chướng ngại vật (2 câu)
+      {
+        id: "q7",
+        content: "Trong không gian Oxyz, khoảng cách từ $M(1, 2, -1)$ đến mặt phẳng $(P): 2x - y + 2z - 3 = 0$ là:",
+        options: ["A. 1", "B. $\\frac{5}{3}$", "C. 2", "D. 3"],
+        correctAnswer: 1,
+        explanation: "$d(M, P) = \\frac{|2(1) - (2) + 2(-1) - 3|}{\\sqrt{4 + 1 + 4}} = \\frac{5}{3}$.",
         difficulty: "Khó",
-        topic: "Hình học không gian"
+        topic: "Oxyz"
+      },
+      {
+        id: "q8",
+        content: "Cho hình chóp $S.ABCD$ có đáy là hình vuông cạnh $a$, $SA \\perp (ABCD)$, $SA = a$. Tính thể tích khối chóp.",
+        options: ["A. $\\frac{a^3}{3}$", "B. $\\frac{a^3}{2}$", "C. $a^3$", "D. $\\frac{a^3}{6}$"],
+        correctAnswer: 0,
+        explanation: "$V = \\frac{1}{3} \\cdot SA \\cdot S_{ABCD} = \\frac{1}{3} \\cdot a \\cdot a^2 = \\frac{a^3}{3}$.",
+        difficulty: "Khó",
+        topic: "Hình học"
+      },
+      // Về đích (2 câu)
+      {
+        id: "q9",
+        content: "Phương trình $\\sin x = \\frac{1}{2}$ có nghiệm tổng quát là:",
+        options: ["A. $x = \\frac{\\pi}{6} + k2\\pi$", "B. $x = \\frac{\\pi}{6} + k2\\pi$ hoặc $x = \\frac{5\\pi}{6} + k2\\pi$", "C. $x = \\frac{\\pi}{3} + k2\\pi$", "D. $x = \\frac{\\pi}{6} + k\\pi$"],
+        correctAnswer: 1,
+        explanation: "$\\sin x = \\frac{1}{2} \\Leftrightarrow x = \\frac{\\pi}{6} + k2\\pi$ hoặc $x = \\pi - \\frac{\\pi}{6} + k2\\pi = \\frac{5\\pi}{6} + k2\\pi$.",
+        difficulty: "Khó",
+        topic: "Lượng giác"
+      },
+      {
+        id: "q10",
+        content: "Cho hàm số $y = x^4 - 2x^2 + 1$. Số điểm cực trị của hàm số là:",
+        options: ["A. 1", "B. 2", "C. 3", "D. 0"],
+        correctAnswer: 2,
+        explanation: "$y' = 4x^3 - 4x = 4x(x^2 - 1) = 0 \\Leftrightarrow x \\in \\{-1, 0, 1\\}$. Hàm số có 3 điểm cực trị.",
+        difficulty: "Khó",
+        topic: "Hàm số"
       }
     ];
 
@@ -265,8 +333,17 @@ export default function App() {
     const isCorrect = index === gameQuestions[currentQuestionIndex].correctAnswer;
     let points = 0;
 
+    // Points vary by round
+    const roundPoints: Record<string, number> = {
+      [RoundType.KHOI_DONG]: 10,
+      [RoundType.TANG_TOC]: 20,
+      [RoundType.DONG_DOI]: 15,
+      [RoundType.VUOT_CHUONG_NGAI_VAT]: 30,
+      [RoundType.VE_DICH]: 40,
+    };
+
     if (isCorrect) {
-      points = 10;
+      points = roundPoints[currentRound] || 10;
       if (starUsed) points *= 2;
       setGameScore(prev => prev + points);
     } else if (starUsed) {
@@ -275,14 +352,19 @@ export default function App() {
 
     setTimeout(() => {
       if (currentQuestionIndex < gameQuestions.length - 1) {
-        setCurrentQuestionIndex(prev => prev + 1);
+        const nextIndex = currentQuestionIndex + 1;
+        setCurrentQuestionIndex(nextIndex);
         setSelectedAnswer(null);
         setIsAnswering(false);
         setTimeLeft(30);
         setStarUsed(false);
         
-        // Advance rounds logic for demo
-        if (currentQuestionIndex === 1) setCurrentRound(RoundType.TANG_TOC);
+        // Advance rounds every 2 questions
+        const rounds = Object.values(RoundType);
+        const roundIndex = Math.floor(nextIndex / 2);
+        if (roundIndex < rounds.length) {
+          setCurrentRound(rounds[roundIndex]);
+        }
       } else {
         finishGame();
       }
@@ -1287,6 +1369,15 @@ const PlanView = ({ apiKey }: { apiKey: string }) => {
           )}
         </AnimatePresence>
       </main>
+
+      <AnimatePresence>
+        {showGroupSelection && (
+          <GroupSelectionModal 
+            onSelect={confirmStartGame} 
+            onClose={() => setShowGroupSelection(false)} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
