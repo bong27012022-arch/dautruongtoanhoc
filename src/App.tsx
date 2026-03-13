@@ -161,6 +161,9 @@ export default function App() {
   const [isAnswering, setIsAnswering] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
   const [starUsed, setStarUsed] = useState(false);
+  const [currentGroup, setCurrentGroup] = useState<string | null>(null);
+  const [showGroupSelection, setShowGroupSelection] = useState(false);
+  const [pendingSubjectId, setPendingSubjectId] = useState<string | null>(null);
 
   useEffect(() => {
     triggerMathJax();
@@ -202,6 +205,16 @@ export default function App() {
       setView("settings");
       return;
     }
+
+    setPendingSubjectId(subjectId);
+    setShowGroupSelection(true);
+  };
+
+  const confirmStartGame = async (group: string) => {
+    setCurrentGroup(group);
+    setShowGroupSelection(false);
+    
+    if (!pendingSubjectId) return;
 
     // Generate mock questions for demo if none exist
     const mockQuestions: Question[] = [
@@ -283,33 +296,130 @@ export default function App() {
       date: new Date().toLocaleDateString("vi-VN"),
       score: gameScore,
       totalQuestions: gameQuestions.length,
-      correctAnswers: gameQuestions.filter((_, i) => i === 0).length, // Placeholder
+      correctAnswers: gameQuestions.filter((q, i) => selectedAnswer === q.correctAnswer).length, // Improved logic
       timeSpent,
+      group: currentGroup || "Khán giả",
       roundResults: [
         { round: RoundType.KHOI_DONG, score: gameScore }
       ]
     };
 
-    setData(prev => ({
-      ...prev,
-      sessions: [newSession, ...prev.sessions],
-      progress: {
-        ...prev.progress,
-        totalAttempts: prev.progress.totalAttempts + 1,
-        averageScore: (prev.progress.averageScore * prev.progress.totalAttempts + gameScore) / (prev.progress.totalAttempts + 1)
-      }
-    }));
-
+    setData(prev => {
+      const g = newSession.group;
+      const currentGStats = prev.groupStats[g] || { totalScore: 0, totalQuestions: 0, correctAnswers: 0, sessionsCount: 0 };
+      
+      return {
+        ...prev,
+        sessions: [newSession, ...prev.sessions],
+        groupStats: {
+          ...prev.groupStats,
+          [g]: {
+            totalScore: currentGStats.totalScore + newSession.score,
+            totalQuestions: currentGStats.totalQuestions + newSession.totalQuestions,
+            correctAnswers: currentGStats.correctAnswers + newSession.correctAnswers,
+            sessionsCount: currentGStats.sessionsCount + 1
+          }
+        },
+        progress: {
+          ...prev.progress,
+          totalAttempts: prev.progress.totalAttempts + 1,
+          averageScore: (prev.progress.averageScore * prev.progress.totalAttempts + gameScore) / (prev.progress.totalAttempts + 1)
+        }
+      };
+    });
+    
     setIsGameActive(false);
     Swal.fire({
       title: "Hoàn thành!",
-      text: `Bạn đạt được ${gameScore} điểm trong ${timeSpent} giây.`,
+      text: `Bạn đạt được ${gameScore} điểm cho ${newSession.group}.`,
       icon: "success",
-      confirmButtonText: "Tuyệt vời"
+      confirmButtonColor: "#6366f1"
     }).then(() => setView("dashboard"));
   };
 
   // --- Views ---
+
+const GroupSelectionModal = ({ 
+  onSelect, 
+  onClose 
+}: { 
+  onSelect: (group: string) => void; 
+  onClose: () => void 
+}) => (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.9, y: 20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      className="bg-white rounded-[3rem] p-10 max-w-lg w-full shadow-2xl overflow-hidden relative"
+    >
+      <div className="absolute top-0 left-0 w-full h-2 premium-gradient" />
+      <h3 className="text-3xl font-black text-slate-800 mb-2">Chọn Tổ thi đấu</h3>
+      <p className="text-slate-500 mb-8 font-medium">Điểm số sẽ được tính vào bảng xếp hạng của Tổ bạn chọn.</p>
+      
+      <div className="grid grid-cols-2 gap-4">
+        {["Tổ 1", "Tổ 2", "Tổ 3", "Tổ 4"].map((group) => (
+          <button
+            key={group}
+            onClick={() => onSelect(group)}
+            className="p-6 rounded-[2rem] border-2 border-slate-100 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-xl font-black text-slate-700 hover:text-indigo-600 flex flex-col items-center gap-3 group"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center group-hover:bg-white transition-colors">
+              <Plus className="text-slate-300 group-hover:text-indigo-500" size={24} />
+            </div>
+            {group}
+          </button>
+        ))}
+      </div>
+      
+      <button 
+        onClick={onClose}
+        className="mt-8 w-full py-4 text-slate-400 font-bold hover:text-slate-600 transition-colors"
+      >
+        Hủy bỏ
+      </button>
+    </motion.div>
+  </div>
+);
+
+const Leaderboard = ({ stats }: { stats: AppData["groupStats"] }) => {
+  const sorted = Object.entries(stats).sort((a, b) => b[1].totalScore - a[1].totalScore);
+  
+  return (
+    <Card className="overflow-hidden p-0">
+      <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="flex items-center gap-3">
+          <Trophy className="text-amber-500" size={24} />
+          <h3 className="font-extrabold text-xl text-slate-800">Xếp hạng Tổ</h3>
+        </div>
+        <span className="text-xs font-black text-slate-400 uppercase tracking-widest">Đấu trường mùa #1</span>
+      </div>
+      <div className="divide-y divide-slate-50">
+        {sorted.map(([name, s], i) => (
+          <div key={name} className="flex items-center justify-between p-6 hover:bg-slate-50/50 transition-colors">
+            <div className="flex items-center gap-5">
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center font-black text-lg",
+                i === 0 ? "bg-amber-100 text-amber-600" :
+                i === 1 ? "bg-slate-100 text-slate-500" :
+                i === 2 ? "bg-orange-100 text-orange-600" : "bg-slate-50 text-slate-300"
+              )}>
+                {i + 1}
+              </div>
+              <div>
+                <div className="font-black text-slate-800">{name}</div>
+                <div className="text-xs font-bold text-slate-400">{s.sessionsCount} trận đấu</div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="font-black text-slate-900 text-xl">{s.totalScore}</div>
+              <div className="text-[10px] font-black text-slate-400 uppercase">Điểm tích lũy</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </Card>
+  );
+};
 
 const DashboardView = ({ data, handleStartGame }: { data: AppData; handleStartGame: (id: string) => void }) => {
   const [selectedGrade, setSelectedGrade] = useState<number>(10);
@@ -381,24 +491,28 @@ const DashboardView = ({ data, handleStartGame }: { data: AppData; handleStartGa
           </div>
         </Card>
 
-        <Card>
-          <h3 className="font-bold text-lg mb-4">Chủ đề cần cải thiện</h3>
-          <div className="space-y-4">
-            {data.progress.weakTopics.length > 0 ? (
-              data.progress.weakTopics.map((topic, i) => (
-                <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
-                  <span className="font-medium text-slate-700">{topic}</span>
-                  <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full">Cần ôn tập</span>
+        <div className="space-y-6">
+          <Leaderboard stats={data.groupStats} />
+          
+          <Card>
+            <h3 className="font-bold text-lg mb-4">Chủ đề cần cải thiện</h3>
+            <div className="space-y-4">
+              {data.progress.weakTopics.length > 0 ? (
+                data.progress.weakTopics.map((topic, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl">
+                    <span className="font-medium text-slate-700">{topic}</span>
+                    <span className="text-xs font-bold text-red-500 bg-red-50 px-2 py-1 rounded-full">Cần ôn tập</span>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-slate-400">
+                  <Award size={48} className="mx-auto mb-2 opacity-20" />
+                  <p>Bạn đang làm rất tốt!</p>
                 </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-slate-400">
-                <Award size={48} className="mx-auto mb-2 opacity-20" />
-                <p>Bạn đang làm rất tốt!</p>
-              </div>
-            )}
-          </div>
-        </Card>
+              )}
+            </div>
+          </Card>
+        </div>
       </div>
 
       <section>

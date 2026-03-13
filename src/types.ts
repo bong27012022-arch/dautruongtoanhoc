@@ -23,6 +23,7 @@ export interface Session {
   totalQuestions: number;
   correctAnswers: number;
   timeSpent: number;
+  group: string;
   roundResults: {
     round: RoundType;
     score: number;
@@ -39,6 +40,12 @@ export interface AppData {
     streakDays: number;
     weakTopics: string[];
   };
+  groupStats: Record<string, {
+    totalScore: number;
+    totalQuestions: number;
+    correctAnswers: number;
+    sessionsCount: number;
+  }>;
   settings: {
     theme: "light" | "dark";
     soundEnabled: boolean;
@@ -84,6 +91,12 @@ export const DEFAULT_DATA: AppData = {
     averageScore: 0,
     streakDays: 0,
     weakTopics: [],
+  },
+  groupStats: {
+    "Tổ 1": { totalScore: 0, totalQuestions: 0, correctAnswers: 0, sessionsCount: 0 },
+    "Tổ 2": { totalScore: 0, totalQuestions: 0, correctAnswers: 0, sessionsCount: 0 },
+    "Tổ 3": { totalScore: 0, totalQuestions: 0, correctAnswers: 0, sessionsCount: 0 },
+    "Tổ 4": { totalScore: 0, totalQuestions: 0, correctAnswers: 0, sessionsCount: 0 },
   },
   settings: {
     theme: "light",
