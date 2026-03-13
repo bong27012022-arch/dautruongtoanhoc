@@ -295,6 +295,8 @@ export default function App() {
   // --- Views ---
 
 const DashboardView = ({ data, handleStartGame }: { data: AppData; handleStartGame: (id: string) => void }) => {
+  const [selectedGrade, setSelectedGrade] = useState<number>(10);
+
   const stats = useMemo(() => {
     const last7Days = data.sessions.slice(0, 7).reverse();
     return {
@@ -302,6 +304,10 @@ const DashboardView = ({ data, handleStartGame }: { data: AppData; handleStartGa
       data: last7Days.map(s => s.score)
     };
   }, [data.sessions]);
+
+  const filteredSubjects = useMemo(() => {
+    return data.subjects.filter(sub => sub.grade === selectedGrade);
+  }, [data.subjects, selectedGrade]);
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
@@ -379,32 +385,58 @@ const DashboardView = ({ data, handleStartGame }: { data: AppData; handleStartGa
       </div>
 
       <section>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-slate-900">Chủ đề ôn luyện</h2>
-          <Button variant="ghost" className="text-blue-600">Xem tất cả</Button>
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-6">
+          <h2 className="text-2xl font-bold text-slate-900 line-clamp-1">Chủ đề ôn luyện</h2>
+          
+          <div className="flex bg-slate-100/50 p-1.5 rounded-2xl border border-slate-200/60 backdrop-blur-md">
+            {[10, 11, 12].map((grade) => (
+              <button
+                key={grade}
+                onClick={() => setSelectedGrade(grade)}
+                className={cn(
+                  "px-6 py-2.5 rounded-xl text-sm font-black transition-all duration-300",
+                  selectedGrade === grade 
+                    ? "bg-white text-indigo-600 shadow-xl shadow-indigo-100/50 border border-slate-100 scale-105" 
+                    : "text-slate-500 hover:text-slate-700 hover:bg-white/50"
+                )}
+              >
+                Khối {grade}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          {data.subjects.map((sub) => {
-            const Icon = ({ Activity, TrendingUp, Sigma, Box, BarChart3 } as any)[sub.icon] || BookOpen;
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredSubjects.map((sub) => {
+            const Icon = ({ Activity, TrendingUp, Sigma, Box, BarChart3, Play } as any)[sub.icon] || BookOpen;
             return (
               <motion.div 
                 key={sub.id} 
-                layoutId={sub.id}
-                onClick={() => handleStartGame(sub.id)}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
                 whileHover={{ y: -8, scale: 1.02 }}
+                onClick={() => handleStartGame(sub.id)}
                 className={cn(
-                  "glass-card rounded-3xl p-8 transition-all cursor-pointer group",
+                  "glass-card rounded-[2.5rem] p-8 transition-all cursor-pointer group relative overflow-hidden",
                   "hover:border-indigo-200 hover:bg-indigo-50/50"
                 )}
               >
-                <div className="w-14 h-14 rounded-2xl premium-gradient text-white flex items-center justify-center mb-6 shadow-lg shadow-indigo-200/50 group-hover:rotate-6 transition-transform">
-                  <Icon size={28} />
+                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 rounded-full -mr-16 -mt-16 group-hover:bg-indigo-100/50 transition-colors" />
+                
+                <div className="w-16 h-16 rounded-3xl premium-gradient text-white flex items-center justify-center mb-6 shadow-xl shadow-indigo-200/50 group-hover:rotate-6 transition-transform relative z-10">
+                  <Icon size={32} />
                 </div>
-                <h4 className="font-extrabold text-slate-800 text-lg mb-2">{sub.name}</h4>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-slate-500">{sub.questionsCount} câu hỏi</span>
-                  <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 opacity-0 group-hover:opacity-100 transition-all">
-                    <ChevronRight size={18} />
+                
+                <h4 className="font-black text-slate-800 text-xl mb-3 leading-tight group-hover:text-indigo-600 transition-colors">{sub.name}</h4>
+                
+                <div className="flex items-center justify-between mt-auto">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
+                    <span className="text-sm font-bold text-slate-400">{sub.questionsCount} câu hỏi</span>
+                  </div>
+                  <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-indigo-600 opacity-0 group-hover:opacity-100 transform translate-x-4 group-hover:translate-x-0 transition-all duration-300">
+                    <ChevronRight size={20} />
                   </div>
                 </div>
               </motion.div>
