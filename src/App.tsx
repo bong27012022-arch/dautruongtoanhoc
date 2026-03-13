@@ -947,6 +947,7 @@ export default function App() {
         </div>
       </div>
     );
+  };
 
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 pb-24 md:pb-0 md:pl-20 lg:pl-64">
